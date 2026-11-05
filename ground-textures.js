@@ -1,0 +1,9 @@
+import * as T from './three.module.js';
+export function addGroundTextures(M){
+ let seed=731;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+ const make=(paint,repeat)=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=512;paint(canvas.getContext('2d'));const texture=new T.CanvasTexture(canvas);texture.wrapS=texture.wrapT=T.RepeatWrapping;texture.repeat.setScalar(repeat);texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=8;return texture};
+ const path=make(ctx=>{ctx.fillStyle='#ab7770';ctx.fillRect(0,0,512,512);for(let i=0;i<110000;i++){const v=random();ctx.fillStyle=v<.33?'rgba(73,55,51,.18)':v<.7?'rgba(230,202,183,.17)':'rgba(163,101,90,.25)';ctx.beginPath();ctx.ellipse(random()*512,random()*512,.3+random()*.8,.3+random()*.6,random()*6,0,Math.PI*2);ctx.fill()}for(let i=0;i<10;i++){ctx.strokeStyle='rgba(134,87,79,.08)';ctx.lineWidth=2+random()*3;const x=random()*512;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+(random()-.5)*30,512);ctx.stroke()}},.25);
+ const grass=make(ctx=>{ctx.fillStyle='#97a878';ctx.fillRect(0,0,512,512);for(let i=0;i<85;i++){const x=random()*512,y=random()*512,r=20+random()*65,g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,random()<.5?'rgba(79,109,62,.18)':'rgba(201,188,119,.24)');g.addColorStop(1,'rgba(150,170,100,0)');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2)}for(let i=0;i<32000;i++){ctx.strokeStyle=['#799267','#b8bd85','#8d9f6a','#9dac79','#6e8b5e'][Math.floor(random()*5)];ctx.globalAlpha=.35+random()*.4;const x=random()*512,y=random()*512;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+(random()-.5)*3,y-1-random()*4);ctx.stroke()}ctx.globalAlpha=1},.125);
+ M.path.map=path;M.path.color.set('#ffffff');M.path.bumpMap=path;M.path.bumpScale=.028;
+ M.grass.map=grass;M.grass.color.set('#ffffff');M.grass.bumpMap=grass;M.grass.bumpScale=.045;
+}

@@ -1,0 +1,18 @@
+import * as T from './three.module.js';
+import {roadSections,roadWidth,roadSurfaceHeight} from './road-surface.js';
+import {clipToSurfaceMask} from './surface-masks.js';
+export function addRoadMarkings({data,terrain,masks,mesh,mat}){
+ const bins=new Map(),cell=80;for(const road of data.roads)for(let j=1;j<road.p.length;j++){const a=road.p[j-1],b=road.p[j],radius=roadWidth(road)/2+2;for(let x=Math.floor((Math.min(a[0],b[0])-radius)/cell);x<=Math.floor((Math.max(a[0],b[0])+radius)/cell);x++)for(let z=Math.floor((Math.min(a[1],b[1])-radius)/cell);z<=Math.floor((Math.max(a[1],b[1])+radius)/cell);z++){const key=x+','+z;if(!bins.has(key))bins.set(key,[]);bins.get(key).push({road,a,b,radius});}}
+ const groundGroups=['#e6e4cf','#d4b84b','#4898bd'].map(color=>({p:[],m:clipToSurfaceMask(mat(color),masks.road,'road-mark-'+color)}));
+ function quad(road,a,b,offset,width,group){for(const [s,d] of [[a,offset-width/2],[b,offset-width/2],[a,offset+width/2],[a,offset+width/2],[b,offset-width/2],[b,offset+width/2]]){const scaled=d*s.width/roadWidth(road),x=s.x+s.nx*scaled,z=s.z+s.nz*scaled;group.p.push(x,roadSurfaceHeight(road,terrain,x,z)+.014,z)}}
+ const bridgeGroups=['#e6e4cf','#d4b84b','#4898bd'].map(color=>({p:[],m:mat(color)}));
+ for(const road of data.roads){const groups=road.bridge?bridgeGroups:groundGroups;if(!['primary','secondary','tertiary','trunk','motorway'].includes(road.type))continue;const width=roadWidth(road),sections=roadSections(road,1.5),lanes=road.lanes||2,laneWidth=(width-.5)/lanes;let distance=0;
+ for(let i=1;i<sections.length;i++){const a=sections[i-1],b=sections[i],d=Math.hypot(b.x-a.x,b.z-a.z);distance+=d;
+  // Avoid marking across the mouth of another intersecting carriageway.
+  if((bins.get(Math.floor(a.x/cell)+','+Math.floor(a.z/cell))||[]).some(s=>{if(s.road===road||s.road.name===road.name)return false;const dx=s.b[0]-s.a[0],dz=s.b[1]-s.a[1],len=Math.hypot(dx,dz)||1,t=((a.x-s.a[0])*dx+(a.z-s.a[1])*dz)/(len*len);return t>0&&t<1&&Math.abs((dx*a.nz-dz*a.nx)/len)<.86&&Math.hypot(a.x-s.a[0]-dx*t,a.z-s.a[1]-dz*t)<s.radius;}))continue;
+  for(let lane=1;lane<lanes;lane++){const offset=width/2-.25-lane*laneWidth;if(!road.oneway&&lane===Math.floor(lanes/2)){quad(road,a,b,offset-.12,.1,groups[1]);quad(road,a,b,offset+.12,.1,groups[1])}else if(distance%9<3.1)quad(road,a,b,offset,.12,groups[0]);}
+  for(const side of [-1,1])quad(road,a,b,side*(width/2-.2),.1,groups[0]);
+  if(String(road.busLanes||'').startsWith('designated'))quad(road,a,b,width/2-.25-laneWidth,.13,groups[2]);
+ }}
+ for(const group of [...groundGroups,...bridgeGroups]){const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(group.p,3));g.computeVertexNormals();group.m.side=T.DoubleSide;mesh(g,group.m).castShadow=false;}
+}
