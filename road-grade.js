@@ -1,3 +1,4 @@
+import {smoothRegionalRoadProfiles} from './road-profile-smoothing.js';
 import {fitRegionalRoadClearance} from './regional-road-clearance.js';
 // Road elevations follow a shared longitudinal engineering profile, never the
 // bank directly underneath each vertex. Mapped junctions share one elevation.
@@ -8,7 +9,7 @@ export function createRoadGrades(data,{streetHeight}){
   // Short lake bridges are a single plane between the approach endpoints.
   profiles.set(road,{samples,heights});
  }
- const clearanceRepairs=fitRegionalRoadClearance(data,profiles);
+ const clearanceRepairs=fitRegionalRoadClearance(data,profiles);smoothRegionalRoadProfiles(data,profiles);
  function height(road,x,z){const {samples,heights}=profiles.get(road);let best=Infinity,y=heights[0];for(let i=1;i<samples.length;i++){const a=samples[i-1],b=samples[i],dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz||1))),d=(x-a[0]-dx*t)**2+(z-a[1]-dz*t)**2;if(d<best){best=d;y=heights[i-1]+(heights[i]-heights[i-1])*t;}}return y;}
  return{height,profiles,clearanceRepairs};
 }
