@@ -1,3 +1,3 @@
 let lastYield=0;
 export async function yieldToBrowser(){if(typeof window==='undefined'||performance.now()-lastYield<24)return;await new Promise(resolve=>setTimeout(resolve,0));lastYield=performance.now();}
-export async function reportLoading(label,percent){const el=typeof document!=='undefined'&&document.querySelector?.('#loading');if(el){el.textContent=label+' · '+percent+'%';el.setAttribute('role','status');el.setAttribute('aria-live','polite');}await yieldToBrowser();}
+export async function reportLoading(label,percent){const el=typeof document!=='undefined'&&document.querySelector?.('#loading');if(el){const phrase=percent<16?'기지개 켜는 중…':percent<36?'세수하는 중…':percent<65?'오늘 입을 옷 고르는 중…':percent<86?'신발 신는 중…':percent<94?'주머니에 소지품 챙기는 중…':percent<100?'현관문 여는 중…':'준비 끝! 산책하러 가요.';el.textContent=phrase+' · '+percent+'%';el.setAttribute('role','status');el.setAttribute('aria-live','polite');}await yieldToBrowser();}
