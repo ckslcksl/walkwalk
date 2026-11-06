@@ -1,0 +1,2 @@
+// Shape-preserving cubic interpolation: continuous grade without overshooting a hill crest.
+export function profileHeight(points,t){const count=points.length-1;if(count<1)return points[0]?.[1]||0;const f=Math.max(0,Math.min(1,t))*count,i=Math.min(count-1,Math.floor(f)),u=f-i,a=points[i][1],b=points[i+1][1],d=b-a,before=i? a-points[i-1][1]:d,after=i+2<=count?points[i+2][1]-b:d,tangent=(x,y)=>x*y<=0?0:2*x*y/(x+y),m0=tangent(before,d),m1=tangent(d,after),u2=u*u,u3=u2*u;return(2*u3-3*u2+1)*a+(u3-2*u2+u)*m0+(-2*u3+3*u2)*b+(u3-u2)*m1;}

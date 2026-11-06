@@ -19,9 +19,9 @@ export function createWalker({scene,mesh,box,mat}){
  }
  const heartShape=new T.Shape();heartShape.moveTo(0,-.1);heartShape.bezierCurveTo(-.22,.02,-.14,.2,0,.11);heartShape.bezierCurveTo(.14,.2,.22,.02,0,-.1);const heartIcon=mesh(new T.ShapeGeometry(heartShape,12),new T.MeshBasicMaterial({color:'#d98b96',side:T.DoubleSide}),body);person.add(heartIcon);heartIcon.position.set(0,2.65,0);const heartFacing=new T.Quaternion();heartIcon.onBeforeRender=(_r,_s,camera)=>{heartIcon.quaternion.copy(person.getWorldQuaternion(heartFacing).invert()).multiply(camera.quaternion);heartIcon.updateMatrixWorld(true);};heartIcon.visible=false;
  const gear=createRideGear(person);let gesture=null,gestureTime=0,ridePhase=0;
- let phase=0,runBlend=0,rootY=0,wasSitting=false;const desiredRotation=new T.Quaternion(),axis=new T.Vector3(0,1,0);
- function update({dt,speed,run,sitting,heading,time,mode='walk',vehicleMode=mode,dismount=false}){
- if(gesture){gestureTime+=dt;if(gestureTime>2.5||speed>.2||sitting)gesture=null;}heartIcon.visible=gesture==='heart';if(heartIcon.visible){heartIcon.scale.setScalar(.8+Math.sin(gestureTime*4)*.12);heartIcon.position.y=2.65+Math.sin(Math.min(1,gestureTime/2.5)*Math.PI)*.35;}const riding=!sitting&&!gesture&&!dismount&&(mode==='bike'||mode==='scooter'),pushing=!riding&&(vehicleMode==='bike'||vehicleMode==='scooter');gear.update(vehicleMode,speed,dt,ridePhase,pushing);
+ let phase=0,runBlend=0,rootY=0,wasSitting=false;const desiredRotation=new T.Quaternion(),axis=new T.Vector3(0,1,0),groundEuler=new T.Euler(0,0,0,'YXZ');
+ function update({dt,speed,run,sitting,heading,time,mode='walk',vehicleMode=mode,dismount=false,groundPitch=0,groundRoll=0}){
+ if(gesture){gestureTime+=dt;if(gestureTime>2.5||speed>.2||sitting)gesture=null;}heartIcon.visible=gesture==='heart';if(heartIcon.visible){heartIcon.scale.setScalar(.8+Math.sin(gestureTime*4)*.12);heartIcon.position.y=2.65+Math.sin(Math.min(1,gestureTime/2.5)*Math.PI)*.35;}const riding=!sitting&&!gesture&&!dismount&&(mode==='bike'||mode==='scooter'),pushing=!riding&&(vehicleMode==='bike'||vehicleMode==='scooter');gear.update(vehicleMode,speed,dt,ridePhase,pushing);for(const vehicle of [gear.bike,gear.scooter]){vehicle.rotation.x=damp(vehicle.rotation.x,pushing?groundPitch:0,dt,12);vehicle.rotation.z=damp(vehicle.rotation.z,pushing?groundRoll:0,dt,12);}
   if(sitting&&!wasSitting){rootY=0;body.rotation.set(0,0,0);body.position.set(0,0,0);spine.position.y=1.03;legs.forEach(l=>l.rotation.x=Math.PI/2);knees.forEach(k=>k.rotation.x=-Math.PI/2);ankles.forEach(a=>a.rotation.x=0);person.quaternion.setFromAxisAngle(axis,heading)}wasSitting=sitting;spine.position.y=damp(spine.position.y,sitting?1.03:.94,dt,18);
   runBlend=damp(runBlend,run?1:0,dt,5);const nominal=lerp(1.35,3.3,runBlend),activity=T.MathUtils.smoothstep(speed,.025,nominal*.65),frequency=lerp(1.05,1.7,runBlend)*Math.min(1,speed/Math.max(nominal,.1));const oldPhase=phase,nextPhase=phase+dt*frequency,footfall=!sitting&&speed>.2&&Math.floor(nextPhase*2)>Math.floor(oldPhase*2);phase=nextPhase%1;
   const duty=lerp(.64,.4,runBlend),stride=frequency>.001?Math.min(.88,speed*duty/frequency):0;
@@ -35,7 +35,7 @@ export function createWalker({scene,mesh,box,mat}){
   spine.rotation.x=damp(spine.rotation.x,sitting?-.04:lerp(-.015,-.13,runBlend)*activity,dt);
   spine.rotation.y=damp(spine.rotation.y,sitting?0:-Math.sin(phase*TAU)*lerp(.055,.11,runBlend)*activity,dt);
   headRig.rotation.x=damp(headRig.rotation.x,-spine.rotation.x*.7,dt,10);headRig.rotation.y=damp(headRig.rotation.y,-spine.rotation.y*.65,dt,10);
-  desiredRotation.setFromAxisAngle(axis,heading);person.quaternion.slerp(desiredRotation,1-Math.exp(-dt*10));
+  desiredRotation.setFromEuler(groundEuler.set(riding?groundPitch:0,heading,riding?groundRoll:0,'YXZ'));person.quaternion.slerp(desiredRotation,1-Math.exp(-dt*10));
   for(let i=0;i<2;i++){
    const c=(phase+i*.5)%1,stance=c<duty,swing=(c-duty)/(1-duty);let z,y,footPitch=0;
    if(stance){const t=c/duty;z=lerp(-stride/2,stride/2,t);y=.085;footPitch=activity*(t<.15?lerp(-.16,0,t/.15):t>.78?lerp(0,.3,(t-.78)/.22):0)}
