@@ -1,6 +1,6 @@
-import {collectWalkPriority} from './walk-priority.js';
-import {roadCutouts} from './road-surface.js';
-import * as T from './three.module.js';
+import {collectWalkPriority} from './walk-priority.js?v=grade-20261107';
+import {roadCutouts} from './road-surface.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
 export const MASK_BOUNDS={minX:-2200,minZ:-2650,w:3500,h:3600};
 export function createSurfaceMasks(data,{terrain,walkSurfaces}={}){
  const {minX,minZ,w,h}=MASK_BOUNDS,size=4096,xy=p=>[(p[0]-minX)/w*size,(p[1]-minZ)/h*size];

@@ -1,4 +1,4 @@
-import {MathUtils} from './three.module.js';
+import {MathUtils} from './three.module.js?v=grade-20261107';
 // Local steering only: longitudinal progress and destination remain on the route graph.
 export function steerInCorridor(state,{x,z,y,dx,dz,width=2,speed,dt,obstacles,base=0}){
  const limit=Math.max(0,width/2-.26),nx=dz,nz=-dx,near=obstacles.filter(o=>Math.abs(o.y-y)<1.6&&Math.hypot(o.x-x,o.z-z)<4.5),clamp=v=>MathUtils.clamp(v,-limit,limit);state.offset??=base;

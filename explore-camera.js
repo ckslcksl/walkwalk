@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 // Camera movement is independent of the walking graph and never advances the avatar.
 export function createExploreCamera({camera,canvas,terrain,onChange}){
  const keys=new Set(),position=new T.Vector3();let active=false,yaw=0,pitch=-.28,fast=false;

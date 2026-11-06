@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 export function createCompanionUI({canvas,peers,local,session,notify}){
  const root=document.createElement('section');root.className='companion-ui';root.innerHTML='<section class="companion-card" id="peer-actions" aria-label="산책자와 함께하기" hidden><div class="companion-heading"><strong id="peer-selected-name"></strong><button id="peer-close" aria-label="산책자 메뉴 닫기">×</button></div><p id="peer-action-hint"></p><div><button id="company-walk">함께 걷기</button><button id="company-run">함께 러닝</button></div></section><section class="companion-card" id="company-request" aria-label="함께 걷기 초대" hidden><strong id="company-request-name"></strong><p id="company-request-text"></p><div><button id="company-accept">수락하고 함께 이동</button><button id="company-decline">거절</button></div></section><div class="company-banner" id="company-banner" role="status" hidden><span id="company-description"></span><button id="company-end">함께 걷기 끝내기</button></div>';
  document.body.append(root);const $=s=>root.querySelector(s);let selected=null,camera=null,down=null;

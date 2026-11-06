@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 const buildingNight={value:0};
 export function setBuildingNight(value){buildingNight.value=T.MathUtils.clamp(value,0,1)}
 // Metric facade patterns stay sharp up close without thousands of separate window meshes.

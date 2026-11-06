@@ -2,8 +2,8 @@ export function createRideAudio(ctx,output){
  const rate=ctx.sampleRate;
  function loop(fill){const buffer=ctx.createBuffer(1,rate*2,rate),data=buffer.getChannelData(0);let low=0,previous=0;for(let i=0;i<data.length;i++){const n=Math.random()*2-1;low+=(n-low)*.035;data[i]=fill(i/rate,n,low,n-previous);previous=n;}const source=ctx.createBufferSource(),gain=ctx.createGain();source.buffer=buffer;source.loop=true;gain.gain.value=0;source.connect(gain).connect(output);source.start();return{source,gain};}
  // Quiet tire roll shared by both vehicles, with a separate freewheel texture.
- const tires=loop((t,n,low)=>low*.65),freewheel=loop((t,n,low,high)=>(high*.055+Math.sin(t*Math.PI*3600)*.019)*Math.exp(-((t*22)%1)*24));
- const kickBuffer=ctx.createBuffer(1,Math.ceil(rate*.22),rate),kickData=kickBuffer.getChannelData(0);for(let i=0;i<kickData.length;i++){const t=i/rate;kickData[i]=((Math.random()*2-1)*.045+Math.sin(t*Math.PI*180)*.018)*Math.sin(Math.PI*i/kickData.length)**2;}
+ const tires=loop((t,n,low)=>low*.08+Math.sin(t*Math.PI*600)*.01*Math.exp(-((t*7)%1)*35)),freewheel=loop((t,n,low,high)=>(high*.006+Math.sin(t*Math.PI*3600)*.012)*Math.exp(-((t*22)%1)*32));
+ const kickBuffer=ctx.createBuffer(1,Math.ceil(rate*.16),rate),kickData=kickBuffer.getChannelData(0);let scrape=0;for(let i=0;i<kickData.length;i++){const t=i/rate;scrape+=(Math.random()*2-1-scrape)*.12;kickData[i]=(scrape*.014+Math.sin(t*Math.PI*180)*.018)*Math.sin(Math.PI*i/kickData.length)**2;}
  let previousPhase=null,previousMode=null,lastKick=-Infinity;
  function update({speed=0,vehicleMode='walk',riding=false,ridePhase=0,enabled=true}){const moving=enabled&&speed>.08,vehicle=vehicleMode==='bike'||vehicleMode==='scooter',volume=moving&&vehicle?Math.min(1,speed/2.5):0,now=ctx.currentTime;
  tires.gain.gain.setTargetAtTime(volume*(vehicleMode==='bike'?2.2:1),now,.08);tires.source.playbackRate.setTargetAtTime(Math.max(.55,Math.min(2,speed/3)),now,.12);

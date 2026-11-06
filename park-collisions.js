@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 export function insideFootprint(x,z,p){let inside=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const a=p[i],b=p[j];if((a[1]>z)!==(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])inside=!inside}return inside}
 export function createParkCollisions(buildings){
  const obstacles=buildings.filter(b=>b.h>1).map(b=>({...b,raised:b.min>.8,min:b.min+(b.ground||0),h:b.h+(b.ground||0),minX:Math.min(...b.p.map(p=>p[0])),maxX:Math.max(...b.p.map(p=>p[0])),minZ:Math.min(...b.p.map(p=>p[1])),maxZ:Math.max(...b.p.map(p=>p[1]))}));

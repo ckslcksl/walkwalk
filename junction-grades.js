@@ -12,6 +12,6 @@ export function fitJunctionGrades(data,heights){
   junctions.set(node,{x:origin[0],z:origin[1],y:heights[node],gx,gz,core,reach:core+4,upper:!!upper});
  }
  const weight=(j,d)=>{const t=Math.max(0,Math.min(1,(d-j.core)/(j.reach-j.core)));return 1-t*t*(3-2*t);};
- for(const e of data.graph.edges){if(e.upper)continue;for(let i=0;i<e.surface.length;i++){const p=e.surface[i],t=i/(e.surface.length-1),terms=[];for(const [node,d] of [[e.a,t*e.length],[e.b,(1-t)*e.length]]){const j=junctions.get(node);if(!j||d>=j.reach)continue;terms.push({w:weight(j,d),h:j.y+j.gx*(p[0]-j.x)+j.gz*(p[2]-j.z)});}if(terms.length){const sum=terms.reduce((n,a)=>n+a.w,0),strength=Math.min(1,sum);p[1]=p[1]*(1-strength)+terms.reduce((n,a)=>n+a.w*a.h,0)/sum*strength;}if(i===0)p[1]=heights[e.a];if(i===e.surface.length-1)p[1]=heights[e.b];}}
+ for(const e of data.graph.edges){if(e.upper||e.sidewalkRoad)continue;for(let i=0;i<e.surface.length;i++){const p=e.surface[i],t=i/(e.surface.length-1),terms=[];for(const [node,d] of [[e.a,t*e.length],[e.b,(1-t)*e.length]]){const j=junctions.get(node);if(!j||d>=j.reach)continue;terms.push({w:weight(j,d),h:j.y+j.gx*(p[0]-j.x)+j.gz*(p[2]-j.z)});}if(terms.length){const sum=terms.reduce((n,a)=>n+a.w,0),strength=Math.min(1,sum);p[1]=p[1]*(1-strength)+terms.reduce((n,a)=>n+a.w*a.h,0)/sum*strength;}if(i===0)p[1]=heights[e.a];if(i===e.surface.length-1)p[1]=heights[e.b];}}
  return junctions;
 }

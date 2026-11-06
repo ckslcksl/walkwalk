@@ -1,6 +1,6 @@
-import * as T from './three.module.js';
-import {roadSections,roadWidth,roadSurfaceHeight} from './road-surface.js';
-import {clipToSurfaceMask} from './surface-masks.js';
+import * as T from './three.module.js?v=grade-20261107';
+import {roadSections,roadWidth,roadSurfaceHeight} from './road-surface.js?v=grade-20261107';
+import {clipToSurfaceMask} from './surface-masks.js?v=grade-20261107';
 export function addRoadMarkings({data,terrain,masks,mesh,mat}){
  const bins=new Map(),cell=80;for(const road of data.roads)for(let j=1;j<road.p.length;j++){const a=road.p[j-1],b=road.p[j],radius=roadWidth(road)/2+2;for(let x=Math.floor((Math.min(a[0],b[0])-radius)/cell);x<=Math.floor((Math.max(a[0],b[0])+radius)/cell);x++)for(let z=Math.floor((Math.min(a[1],b[1])-radius)/cell);z<=Math.floor((Math.max(a[1],b[1])+radius)/cell);z++){const key=x+','+z;if(!bins.has(key))bins.set(key,[]);bins.get(key).push({road,a,b,radius});}}
  const junctionNodes=new Map();for(const road of data.roads)for(let i=0;i<road.p.length;i++){const p=road.p[i],key=p.join(',');if(!junctionNodes.has(key))junctionNodes.set(key,{p,roads:new Set(),arms:[]});const node=junctionNodes.get(key);node.roads.add(road);for(const q of [road.p[i-1],road.p[i+1]])if(q){const dx=q[0]-p[0],dz=q[1]-p[1],d=Math.hypot(dx,dz);if(d>.1&&!node.arms.some(a=>(a[0]*dx+a[1]*dz)/d>.98))node.arms.push([dx/d,dz/d]);}}const junctions=[...junctionNodes.values()].filter(j=>j.roads.size>1&&j.arms.length>=3).map(j=>({...j,r:Math.max(...[...j.roads].map(r=>roadWidth(r)/2))+2}));

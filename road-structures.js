@@ -1,7 +1,7 @@
-import {bridgeRailRuns} from './bridge-rails.js';
-import * as T from './three.module.js';
-import {roadWidth,roadSections,roadSurfaceGeometry,roadSurfaceHeight} from './road-surface.js';
-import {clipToSurfaceMask} from './surface-masks.js';
+import {bridgeRailRuns} from './bridge-rails.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
+import {roadWidth,roadSections,roadSurfaceGeometry,roadSurfaceHeight} from './road-surface.js?v=grade-20261107';
+import {clipToSurfaceMask} from './surface-masks.js?v=grade-20261107';
 export function addBridgeStructures({data,terrain,mesh,mat,box,walkSurfaces}){
  const concrete=mat('#b5b3a5'),steel=mat('#66766f'),curb=mat('#c7c4b5');
  function beam(road,a,b,w,h,material,offset){const ya=roadSurfaceHeight(road,terrain,a[0],a[1])+offset,yb=roadSurfaceHeight(road,terrain,b[0],b[1])+offset,direction=new T.Vector3(b[0]-a[0],yb-ya,b[1]-a[1]),length=direction.length();if(length<.01)return;const o=box(w,h,length,material,(a[0]+b[0])/2,(ya+yb)/2,(a[1]+b[1])/2);o.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),direction.normalize());}

@@ -1,5 +1,5 @@
-import {createRideGear} from './ride-gear.js';
-import * as T from './three.module.js';
+import {createRideGear} from './ride-gear.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
 const TAU=Math.PI*2,lerp=T.MathUtils.lerp,damp=(a,b,dt,rate=16)=>lerp(a,b,1-Math.exp(-rate*dt));
 export function createWalker({scene,mesh,box,mat}){
  const person=new T.Group(),body=new T.Group(),spine=new T.Group(),headRig=new T.Group();scene.add(person);person.add(body);body.add(spine);spine.position.y=.94;

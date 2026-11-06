@@ -1,5 +1,5 @@
-import {roadWidth,roadSurfaceHeight} from './road-surface.js';
-import * as T from './three.module.js';
+import {roadWidth,roadSurfaceHeight} from './road-surface.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
 export function createBridgeClearance(data,terrain,walkSurfaces){
  const spans=data.roads.filter(r=>r.bridge).flatMap(r=>r.p.slice(1).map((b,i)=>({a:r.p[i],b,width:roadWidth(r),road:r}))).concat(data.graph.edges.filter(e=>e.bridge).map(e=>({a:data.graph.nodes[e.a],b:data.graph.nodes[e.b],width:e.width||3.2,walk:e})));
  function ceilingAt(x,z){let ceiling=Infinity;for(const s of spans){const dx=s.b[0]-s.a[0],dz=s.b[1]-s.a[1],t=((x-s.a[0])*dx+(z-s.a[1])*dz)/(dx*dx+dz*dz||1);if(t<0||t>1)continue;const d=Math.hypot(x-s.a[0]-dx*t,z-s.a[1]-dz*t);if(d<=s.width/2+.15)ceiling=Math.min(ceiling,s.walk?(walkSurfaces?walkSurfaces.surfaceAt(s.walk,x,z,t)-.255:(s.walk.surface?(()=>{const f=t*(s.walk.surface.length-1),i=Math.min(s.walk.surface.length-2,Math.floor(f));return T.MathUtils.lerp(s.walk.surface[i][1],s.walk.surface[i+1][1],f-i)})():terrain.streetHeight(x,z)+.22)-.255):roadSurfaceHeight(s.road,terrain,x,z)-.6)}return ceiling}

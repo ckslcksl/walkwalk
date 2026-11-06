@@ -1,6 +1,6 @@
-import {yieldToBrowser} from './loading-progress.js';
-import * as T from './three.module.js';
-import {clipToSurfaceMask} from './surface-masks.js';
+import {yieldToBrowser} from './loading-progress.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
+import {clipToSurfaceMask} from './surface-masks.js?v=grade-20261107';
 // Every paving vertex uses the same height field as the walker, including crossings.
 // No independent landing rectangles may span over a neighboring lower path.
 function* buildaddPathMesh({data,terrain,mesh,mat,M,walkSurfaces,masks}){

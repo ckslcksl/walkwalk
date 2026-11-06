@@ -1,4 +1,4 @@
-import * as T from'./three.module.js';
+import * as T from'./three.module.js?v=grade-20261107';
 // Reference vocabulary: Sujigucheong stone shopfronts, framed glazing and stacked sign bands.
 // Footprints/heights still come from OSM; unverified individual shop identities are omitted.
 export function addRegionalStreetDetails({data,terrain,mesh,box,mat}){const stone=mat('#bbb7a9'),glass=mat('#46727b'),frame=mat('#656e6c'),dark=mat('#455656'),signs=['#e9e6d9','#d5b96b','#587873','#7a879e','#b0836c'].map(mat),stats={shopfronts:0,civicFronts:0};

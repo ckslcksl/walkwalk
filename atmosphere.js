@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 export function createAtmosphere(scene){
  const uniforms={sunDir:{value:new T.Vector3(0,1,0)},day:{value:1},night:{value:0},time:{value:0}};
  const material=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms,vertexShader:`varying vec3 direction;void main(){direction=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`

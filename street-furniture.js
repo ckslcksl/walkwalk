@@ -1,5 +1,5 @@
-import * as T from './three.module.js';
-import {placeStreetFurniture} from './street-placement.js';
+import * as T from './three.module.js?v=grade-20261107';
+import {placeStreetFurniture} from './street-placement.js?v=grade-20261107';
 export function addStreetFurniture({scene,data,terrain,walkSurfaces,mesh,box,mat,M}){
  const steel=mat('#586867'),roof=mat('#d3d7cf'),glass=new T.MeshStandardMaterial({color:'#7babb0',roughness:.25,transparent:true,opacity:.35,side:T.DoubleSide}),blue=mat('#36688b'),yellow=mat('#d6ad43');
  function sign(text,ref,color){const c=document.createElement('canvas');c.width=data.region==='suji'?256:512;c.height=data.region==='suji'?96:192;const ctx=c.getContext('2d');if(data.region==='suji')ctx.scale(.5,.5);ctx.fillStyle=color;ctx.fillRect(0,0,512,192);ctx.fillStyle='#fff';ctx.font='bold 31px sans-serif';ctx.fillText(text.slice(0,16),22,70);ctx.font='24px sans-serif';ctx.fillText(ref,22,121);ctx.fillStyle='rgba(255,255,255,.65)';ctx.fillRect(22,148,400,3);const map=new T.CanvasTexture(c);map.colorSpace=T.SRGBColorSpace;return new T.MeshBasicMaterial({map,side:T.DoubleSide})}

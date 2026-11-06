@@ -1,17 +1,17 @@
-import {createOnlineWalk} from './online-walk.js?v=company-1';
-import {createRideGround} from './ride-ground.js';
-import {createNameTag} from './name-tag.js';
-import {TRAVEL_MODES,travelState} from './travel-modes.js';
-import {createStreetLife} from './street-life.js';
-import {createExploreCamera} from './explore-camera.js';
-import * as T from './three.module.js';
-import {buildWorld} from './geo-world.js';
-import {createWalker} from './locomotion.js?v=ride-audio-1';
-import {createSoundscape} from './soundscape.js?v=bike-volume-2';
-import {createSeoulDaylight} from './seoul-daylight.js';
-import {connectCharacterSettings} from './character-settings.js';
-import {RouteNavigator} from './route-navigation.js?v=company-1';
-import {connectRouteMap} from './route-map.js';
+import {createOnlineWalk} from './online-walk.js?v=grade-20261107';
+import {createRideGround} from './ride-ground.js?v=grade-20261107';
+import {createNameTag} from './name-tag.js?v=grade-20261107';
+import {TRAVEL_MODES,travelState} from './travel-modes.js?v=grade-20261107';
+import {createStreetLife} from './street-life.js?v=grade-20261107';
+import {createExploreCamera} from './explore-camera.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
+import {buildWorld} from './geo-world.js?v=grade-20261107';
+import {createWalker} from './locomotion.js?v=grade-20261107';
+import {createSoundscape} from './soundscape.js?v=grade-20261107';
+import {createSeoulDaylight} from './seoul-daylight.js?v=grade-20261107';
+import {connectCharacterSettings} from './character-settings.js?v=grade-20261107';
+import {RouteNavigator} from './route-navigation.js?v=grade-20261107';
+import {connectRouteMap} from './route-map.js?v=grade-20261107';
 const $=s=>document.querySelector(s),TAU=Math.PI*2;
 const startupAt=performance.now();const scene=new T.Scene();scene.background=new T.Color('#c9e1e3');scene.fog=new T.Fog('#c9e1e3',1000,3300);
 const renderer=new T.WebGLRenderer({antialias:innerWidth>700});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,innerWidth<700?1.25:1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;$('#world').append(renderer.domElement);
@@ -19,7 +19,7 @@ const camera=new T.PerspectiveCamera(53,innerWidth/innerHeight,.1,6000);const he
 const mat=c=>new T.MeshStandardMaterial({color:c,roughness:.85});const M={grass:mat('#a5b484'),path:mat('#d4c7b3'),edge:mat('#e5dcca'),wood:mat('#aa8260'),metal:mat('#456158'),trunk:mat('#82715d'),stone:mat('#c7c2ae'),pink:mat('#f0c9cf'),pink2:mat('#f7dce0'),green:mat('#86a778')};
 function mesh(g,m,parent=scene){let a=new T.Mesh(g,m);a.castShadow=true;a.receiveShadow=true;parent.add(a);return a}function box(w,h,d,m,x,y,z,parent=scene){let a=mesh(new T.BoxGeometry(w,h,d),m,parent);a.position.set(x,y,z);return a}
 let seed=39;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
-const region=new URLSearchParams(location.search).get('map')==='2'?'suji':'jamsil';$('#region-select').value=region;$('#region-select').onchange=e=>{const url=new URL(location.href);if(e.target.value==='suji')url.searchParams.set('map','2');else url.searchParams.delete('map');location.assign(url)};if(region==='suji'){$('#loading').textContent='기지개 켜는 중…';$('#destination-distance').textContent='성복역 · 수지구청역 · 성복천 · 수지체육공원';}const worldBuilder=region==='suji'?(await import('./regional-world.js')).buildRegionalWorld:buildWorld;
+const region=new URLSearchParams(location.search).get('map')==='2'?'suji':'jamsil';$('#region-select').value=region;$('#region-select').onchange=e=>{const url=new URL(location.href);if(e.target.value==='suji')url.searchParams.set('map','2');else url.searchParams.delete('map');location.assign(url)};if(region==='suji'){$('#loading').textContent='기지개 켜는 중…';$('#destination-distance').textContent='성복역 · 수지구청역 · 성복천 · 수지체육공원';}const worldBuilder=region==='suji'?(await import('./regional-world.js?v=grade-20261107')).buildRegionalWorld:buildWorld;
 const {terrain,walkSurfaces,route,tangent,outward,length,seats,ripples,rippleMat,projectMap,data,lamps,lampMaterial,lampGlowMaterial,constrainCamera}=await worldBuilder({scene,M,mesh,box,mat,rand});const wrap=u=>((u%1)+1)%1;
 const walker=createWalker({scene,mesh,box,mat}),person=walker.person,rideGround=createRideGround();
 const navigator=new RouteNavigator(data.graph,seats);

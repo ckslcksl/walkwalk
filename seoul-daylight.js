@@ -1,6 +1,6 @@
-import * as T from './three.module.js';
-import {createAtmosphere} from './atmosphere.js';
-import {setBuildingNight} from './building-details.js';
+import * as T from './three.module.js?v=grade-20261107';
+import {createAtmosphere} from './atmosphere.js?v=grade-20261107';
+import {setBuildingNight} from './building-details.js?v=grade-20261107';
 const RAD=Math.PI/180;
 // NOAA fractional-year solar approximation; fixed Seoul coordinates and UTC+09:00.
 // https://gml.noaa.gov/grad/solcalc/solareqns.PDF

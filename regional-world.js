@@ -1,27 +1,28 @@
-import{preloadWalkwayCache}from'./walkway-cache.js';
-import{addStreetFurniture}from'./street-furniture.js';
-import{addRegionalStreetDetails}from'./regional-street-details.js';
-import {smoothTerrainGrid} from './terrain-contours.js';
-import {addUnifiedWalkwaysAsync} from './walkway-union.js';
-import {spatialMeshes} from './spatial-meshes.js';
-import {preloadBankCache} from './surface-cache.js';
-import {createSportsGround,addSportsFacilities} from './sports-facilities.js';
-import {createStreamIndex} from './stream-index.js';
-import {yieldToBrowser,reportLoading} from './loading-progress.js';
-import * as T from './three.module.js';
-import {addPathBanksAsync} from './path-banks.js';
-import {gridSurfaceHeight,addPavingFoundations} from './terrain-support.js';
-import {createRoadGrades} from './road-grade.js';
-import {createRoadOccupancy} from './road-occupancy.js';
-import {createWalkSurfaces} from './walk-surfaces.js';
-import {createSurfaceMasks,clipToSurfaceMask} from './surface-masks.js';
-import {addRoadMesh} from './road-mesh.js';
-import {addPathMeshAsync} from './path-mesh.js';
-import {buildingFooting,addBuildingFoundations} from './building-ground.js';
-import {facadeMaterial,addRoofDetails} from './building-details.js';
-import {createParkCollisions} from './park-collisions.js';
-import {createBridgeClearance} from './bridge-clearance.js';
-import {addGroundTextures} from './ground-textures.js';
+import{addRegionalLandscape}from'./regional-landscape.js?v=grade-20261107';
+import{preloadWalkwayCache}from'./walkway-cache.js?v=grade-20261107';
+import{addStreetFurniture}from'./street-furniture.js?v=grade-20261107';
+import{addRegionalStreetDetails}from'./regional-street-details.js?v=grade-20261107';
+import {smoothTerrainGrid} from './terrain-contours.js?v=grade-20261107';
+import {addUnifiedWalkwaysAsync} from './walkway-union.js?v=grade-20261107';
+import {spatialMeshes} from './spatial-meshes.js?v=grade-20261107';
+import {preloadBankCache} from './surface-cache.js?v=grade-20261107';
+import {createSportsGround,addSportsFacilities} from './sports-facilities.js?v=grade-20261107';
+import {createStreamIndex} from './stream-index.js?v=grade-20261107';
+import {yieldToBrowser,reportLoading} from './loading-progress.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
+import {addPathBanksAsync} from './path-banks.js?v=grade-20261107';
+import {gridSurfaceHeight,addPavingFoundations} from './terrain-support.js?v=grade-20261107';
+import {createRoadGrades} from './road-grade.js?v=grade-20261107';
+import {createRoadOccupancy} from './road-occupancy.js?v=grade-20261107';
+import {createWalkSurfaces} from './walk-surfaces.js?v=grade-20261107';
+import {createSurfaceMasks,clipToSurfaceMask} from './surface-masks.js?v=grade-20261107';
+import {addRoadMesh} from './road-mesh.js?v=grade-20261107';
+import {addPathMeshAsync} from './path-mesh.js?v=grade-20261107';
+import {buildingFooting,addBuildingFoundations} from './building-ground.js?v=grade-20261107';
+import {facadeMaterial,addRoofDetails} from './building-details.js?v=grade-20261107';
+import {createParkCollisions} from './park-collisions.js?v=grade-20261107';
+import {createBridgeClearance} from './bridge-clearance.js?v=grade-20261107';
+import {addGroundTextures} from './ground-textures.js?v=grade-20261107';
 
 const clamp=T.MathUtils.clamp,lerp=T.MathUtils.lerp;
 function pointSegment(x,z,a,b){const dx=b[0]-a[0],dz=b[1]-a[1],t=clamp(((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz||1),0,1),px=lerp(a[0],b[0],t),pz=lerp(a[1],b[1],t);return{d:Math.hypot(x-px,z-pz),x:px,z:pz,t};}
@@ -38,7 +39,7 @@ export function createRegionalTerrain(data,dem){
 function inside(x,z,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const a=p[i],b=p[j];if((a[1]>z)!==(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
 function shape(points){const s=new T.Shape();points.forEach((p,i)=>i?s.lineTo(p[0],-p[1]):s.moveTo(p[0],-p[1]));s.closePath();return s;}
 export async function buildRegionalWorld({scene,M,mesh,box,mat,rand}){if(typeof window!=='undefined'){preloadBankCache();preloadWalkwayCache();}
- const [data,dem]=await Promise.all(['suji-geo.json','suji-terrain.json'].map(async p=>{const r=await fetch('./'+p);if(!r.ok)throw Error('수지 지도 데이터를 불러오지 못했습니다');return r.json()}));await reportLoading('지형 높이 준비',8);addGroundTextures(M);const terrain=createRegionalTerrain(data,dem),clearRoad=createRoadOccupancy(data);
+ const [data,dem]=await Promise.all(['suji-geo.json','suji-terrain.json'].map(async p=>{const r=await fetch('./'+p+'?v=grade-20261107');if(!r.ok)throw Error('수지 지도 데이터를 불러오지 못했습니다');return r.json()}));await reportLoading('지형 높이 준비',8);addGroundTextures(M);const terrain=createRegionalTerrain(data,dem),clearRoad=createRoadOccupancy(data);
  // Water strips follow the surveyed stream centerline and the regional downstream grade.
  for(const stream of data.streams){const p=[],ix=[],left=[],right=[];for(let i=0;i<stream.p.length;i++){const a=stream.p[Math.max(0,i-1)],b=stream.p[Math.min(stream.p.length-1,i+1)],dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz)||1,c=stream.p[i];for(const side of [-1,1]){const x=c[0]+dz/l*stream.width/2*side,z=c[1]-dx/l*stream.width/2*side;p.push(x,terrain.streetHeight(c[0],c[1])-3.1,z);(side<0?left:right).push([x,z]);}if(i){const k=i*2;ix.push(k-2,k,k-1,k-1,k,k+1)}}data.rivers.push(left.concat(right.reverse()));const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setIndex(ix);g.computeVertexNormals();mesh(g,mat('#679eaa')).castShadow=false;}
  await reportLoading('보행 경로 연결',16);const walkSurfaces=createWalkSurfaces({data,terrain}),masks=createSurfaceMasks(data,{terrain,walkSurfaces}),bridgeClearance=createBridgeClearance(data,terrain,walkSurfaces);
@@ -61,7 +62,7 @@ export async function buildRegionalWorld({scene,M,mesh,box,mat,rand}){if(typeof 
   const px=x+nx*1.25,pz=z+nz*1.25,py=terrain.topHeight(px,pz);box(.1,4,.1,M.metal,px,py+2,pz);const globe=mesh(new T.SphereGeometry(.23,8,6),lampMaterial);globe.position.set(px,py+4.1,pz);lamps.push(globe.position.clone());if(seats.length>=90)break;
  }
  const crown=new T.IcosahedronGeometry(1,1),trunk=new T.CylinderGeometry(.18,.28,3.4,6);for(let i=0;i<1800;i++){const park=data.parks[i%data.parks.length],xs=park.p.map(p=>p[0]),zs=park.p.map(p=>p[1]),x=Math.min(...xs)+rand()*(Math.max(...xs)-Math.min(...xs)),z=Math.min(...zs)+rand()*(Math.max(...zs)-Math.min(...zs));if(terrain.sportsGround.contains(x,z)||!inside(x,z,park.p)||!clearRoad(x,z,3)||!collisions.clearGround({x,z},3)||walkSurfaces.nearPath(x,z,3))continue;const y=terrain.topHeight(x,z),t=mesh(trunk,M.trunk);t.position.set(x,y+1.7,z);const c=mesh(crown,M.green);c.position.set(x,y+4.3,z);c.scale.set(2.4+rand(),2.4+rand()*1.5,2.4+rand());}
- await reportLoading('화면 준비',94);await batchStatic(scene);await reportLoading('완료',100);const firstPath=data.graph.edges.find(e=>e.length>5),start=data.graph.nodes[firstPath.a],end=data.graph.nodes[firstPath.b],route=u=>new T.Vector3(lerp(start[0],end[0],u),terrain.ground(...start),lerp(start[1],end[1],u)),tangent=()=>new T.Vector3(end[0]-start[0],0,end[1]-start[1]).normalize(),outward=()=>new T.Vector3(tangent().z,0,-tangent().x),ripples=new T.Group(),rippleMat={opacity:0};scene.add(ripples);
+ addRegionalLandscape({data,terrain,walkSurfaces,collisions,clearRoad,mesh,mat,rand});await reportLoading('화면 준비',94);await batchStatic(scene);await reportLoading('완료',100);const firstPath=data.graph.edges.find(e=>e.length>5),start=data.graph.nodes[firstPath.a],end=data.graph.nodes[firstPath.b],route=u=>new T.Vector3(lerp(start[0],end[0],u),terrain.ground(...start),lerp(start[1],end[1],u)),tangent=()=>new T.Vector3(end[0]-start[0],0,end[1]-start[1]).normalize(),outward=()=>new T.Vector3(tangent().z,0,-tangent().x),ripples=new T.Group(),rippleMat={opacity:0};scene.add(ripples);
  return{terrain,walkSurfaces,pathBankSeams,data,seats,lamps,lampMaterial,lampGlowMaterial,route,tangent,outward,length:1000,ripples,rippleMat,projectMap:p=>p,constrainCamera:(camera,target)=>{collisions.constrainCamera(camera,target);return bridgeClearance.constrain(camera,target)}};
 }
 async function batchStatic(scene){scene.updateMatrixWorld(true);const meshes=[];scene.traverse(o=>{if(o.isMesh)meshes.push(o)});const batches=new Map();for(const o of meshes){if(batches.size%30===0)await yieldToBrowser();if(Array.isArray(o.material))continue;const key=o.material.uuid+'-'+o.castShadow;if(!batches.has(key))batches.set(key,{m:o.material,cast:o.castShadow,g:[]});const g=o.geometry.clone();g.applyMatrix4(o.matrixWorld);batches.get(key).g.push(g);o.removeFromParent();}for(const {m,cast,g:geos} of batches.values()){const colored=geos.some(g=>g.attributes.color);const n=geos.reduce((n,g)=>n+g.attributes.position.count,0),p=new Float32Array(n*3),norm=new Float32Array(n*3),uv=new Float32Array(n*2),colors=colored?new Float32Array(n*3).fill(1):null,indexCount=geos.reduce((n,g)=>n+(g.index?.count||g.attributes.position.count),0),indices=new Uint32Array(indexCount);let offset=0,indexOffset=0;for(const g of geos){await yieldToBrowser();const count=g.attributes.position.count;p.set(g.attributes.position.array,offset*3);norm.set(g.attributes.normal.array,offset*3);if(m.userData.preserveUV&&g.attributes.uv)uv.set(g.attributes.uv.array,offset*2);else for(let i=0;i<count;i++){const slope=m.userData.slopeUV&&Math.abs(g.attributes.normal.getY(i))<.55;uv[(offset+i)*2]=slope&&Math.abs(g.attributes.normal.getX(i))>Math.abs(g.attributes.normal.getZ(i))?g.attributes.position.getZ(i):g.attributes.position.getX(i);uv[(offset+i)*2+1]=slope?g.attributes.position.getY(i):g.attributes.position.getZ(i);}if(g.attributes.color)colors.set(g.attributes.color.array,offset*3);const sourceIndex=g.index?.array;for(let i=0;i<(sourceIndex?.length||count);i++)indices[indexOffset++]=offset+(sourceIndex?sourceIndex[i]:i);offset+=count;g.dispose()}const g=new T.BufferGeometry();g.setIndex(new T.BufferAttribute(indices,1));g.setAttribute('position',new T.BufferAttribute(p,3));g.setAttribute('normal',new T.BufferAttribute(norm,3));g.setAttribute('uv',new T.BufferAttribute(uv,2));if(colored)g.setAttribute('color',new T.BufferAttribute(colors,3));for(const mesh of spatialMeshes(g,m)){mesh.castShadow=cast;mesh.receiveShadow=true;scene.add(mesh)};}}

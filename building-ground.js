@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 export function buildingFooting(building,terrain){
  const samples=[];for(let i=0;i<building.p.length;i++){const a=building.p[i],b=building.p[(i+1)%building.p.length],n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/2));for(let j=0;j<n;j++){const t=j/n,x=a[0]+(b[0]-a[0])*t,z=a[1]+(b[1]-a[1])*t;samples.push([x,terrain.ground(x,z),z])}}
  return{base:Math.max(...samples.map(p=>p[1])),samples};

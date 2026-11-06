@@ -1,6 +1,6 @@
-import {steerInCorridor} from './corridor-avoidance.js';
-import * as T from './three.module.js';
-import {roadSections,roadSurfaceHeight} from './road-surface.js';
+import {steerInCorridor} from './corridor-avoidance.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
+import {roadSections,roadSurfaceHeight} from './road-surface.js?v=grade-20261107';
 const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 export function createStreetLife({scene,data,terrain,walkSurfaces,lowPower=false}){
  const root=new T.Group();root.name='street-life';scene.add(root);let enabled=true,elapsed=0,seed=407;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;},origin=data.graph.nodes[data.graph.start],adj=data.graph.nodes.map(()=>[]);data.graph.edges.forEach((e,i)=>{if(e.tunnel)return;adj[e.a].push(i);adj[e.b].push(i);});

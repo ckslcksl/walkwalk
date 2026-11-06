@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 // Stylized details based on the lakeside castle and Seoul City's atelier exterior photos.
 export function addLakeArchitecture({data,scene,mesh,box,mat,castle}){const pale=mat('#eee3cf'),blue=mat('#46789d'),dark=mat('#38545c'),stone=mat('#b7b1a8');
  function arch(w,h,depth,material,x,y,z,parent){const s=new T.Shape();s.moveTo(-w/2,0);s.lineTo(w/2,0);s.lineTo(w/2,h-w/2);s.absarc(0,h-w/2,w/2,0,Math.PI,false);s.closePath();const o=mesh(new T.ExtrudeGeometry(s,{depth,bevelEnabled:false,curveSegments:8}),material,parent);o.position.set(x,y,z);return o;}

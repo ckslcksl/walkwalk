@@ -1,5 +1,5 @@
-import {indexedTerrain} from './indexed-terrain.js';
-import * as T from './three.module.js';
+import {indexedTerrain} from './indexed-terrain.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
 // Sample the actual rendered triangle surface, rather than a different analytic
 // DEM height. Road/path foundations therefore meet the mesh visible from the side.
 export function gridSurfaceHeight(geometry,minX,minZ,width,depth,nx,nz){

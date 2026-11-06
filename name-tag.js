@@ -1,2 +1,2 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 export function createNameTag(person,input){const label=document.createElement('div');label.className='player-name';label.hidden=true;document.body.append(label);const anchor=new T.Vector3();let oldName='';return{update(camera,hide=false){const name=input.value.trim();if(name!==oldName){label.textContent=name;oldName=name;}anchor.set(0,2.22,0).applyMatrix4(person.matrixWorld).project(camera);label.hidden=hide||!name||anchor.z< -1||anchor.z>1||Math.abs(anchor.x)>1.05||Math.abs(anchor.y)>1.05;if(!label.hidden){label.style.transform='translate(-50%,-100%) translate('+((anchor.x+1)*innerWidth/2)+'px,'+((1-anchor.y)*innerHeight/2)+'px)';}}};}

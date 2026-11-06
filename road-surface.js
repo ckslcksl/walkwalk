@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 export const roadWidth=road=>Math.max(3,Math.min(60,road.width));
 export function roadSections(road,spacing=2){
  const points=[];for(const p of road.p){if(points.length&&Math.hypot(p[0]-points.at(-1)[0],p[1]-points.at(-1)[1])<.5){if(p===road.p.at(-1)&&points.length>1)points[points.length-1]=p;continue;}points.push(p);}const frames=points.map((p,i)=>{let before=i-1,after=i+1;while(before>=0&&Math.hypot(p[0]-points[before][0],p[1]-points[before][1])<.01)before--;while(after<points.length&&Math.hypot(p[0]-points[after][0],p[1]-points[after][1])<.01)after++;const a=points[Math.max(0,before)],b=points[Math.min(points.length-1,after)],incoming=[p[0]-a[0],p[1]-a[1]],outgoing=[b[0]-p[0],b[1]-p[1]],li=Math.hypot(...incoming),lo=Math.hypot(...outgoing);if(!li||!lo){const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz)||1;return[dz/len,-dx/len]}const n1=[incoming[1]/li,-incoming[0]/li],n2=[outgoing[1]/lo,-outgoing[0]/lo],mx=n1[0]+n2[0],mz=n1[1]+n2[1],l=Math.hypot(mx,mz)||1,c=Math.max(.74,(mx*n2[0]+mz*n2[1])/l);return[mx/l/c,mz/l/c]});
@@ -11,7 +11,7 @@ export function roadSurfaceGeometry(road,terrain){
  for(let i=0;i<sections.length-1;i++)for(let j=0;j<across;j++){const k=i*(across+1)+j;indices.push(k,k+across+1,k+1,k+1,k+across+1,k+across+2)}
  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();return g;
 }
-export function roadSurfaceHeight(road,terrain,x,z){if(terrain.region==='suji'&&!road.bridge){const paved=terrain.pavedRoadHeight?.(x,z);if(Number.isFinite(paved))return paved;const near=terrain.nearestRoad(x,z);if(near)return terrain.roadHeight(near.road,near.x,near.z)+.065;}return terrain.roadHeight(road,x,z)+.065}
+export function roadSurfaceHeight(road,terrain,x,z){if(terrain.region==='suji'&&!road.bridge){const paved=terrain.pavedRoadHeight?.(x,z);if(Number.isFinite(paved))return paved;const near=terrain.nearestRoad(x,z);if(near)return (terrain.streetWalkHeight?.(near.road,x,z,terrain.roadHeight(near.road,near.x,near.z))??terrain.roadHeight(near.road,near.x,near.z))+.065;}return terrain.roadHeight(road,x,z)+.065}
 export function roadOutline(road,margin=.35){const s=roadSections(road,1.5);return s.map(p=>[p.x+p.nx*(p.width/2+margin),p.z+p.nz*(p.width/2+margin)]).concat(s.slice().reverse().map(p=>[p.x-p.nx*(p.width/2+margin),p.z-p.nz*(p.width/2+margin)]));}
 // Fill each strip separately: a whole-road outline can self-intersect at a tight bend.
 export function roadCutouts(road){const s=roadSections(road,1.5),result=[],edge=(p,side)=>[Math.fround(p.x+p.nx*p.width/2*side),Math.fround(p.z+p.nz*p.width/2*side)];for(let i=1;i<s.length;i++){const a=edge(s[i-1],-1),b=edge(s[i],-1),c=edge(s[i-1],1),d=edge(s[i],1);result.push([a,b,c],[c,b,d]);}return result;}

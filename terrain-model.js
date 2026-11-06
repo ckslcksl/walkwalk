@@ -1,7 +1,7 @@
-import {createRoadGrades} from './road-grade.js';
-import {roadWidth} from './road-surface.js';
-import * as T from './three.module.js';
-import {clipToSurfaceMask} from './surface-masks.js';
+import {createRoadGrades} from './road-grade.js?v=grade-20261107';
+import {roadWidth} from './road-surface.js?v=grade-20261107';
+import * as T from './three.module.js?v=grade-20261107';
+import {clipToSurfaceMask} from './surface-masks.js?v=grade-20261107';
 export function createTerrainModel({data,dem,route,outward}){
  const {nx,nz,spacing,minX,minZ}=dem,filtered=[];
  // Reject isolated urban roof/tree spikes in the regional DEM, without vertical exaggeration.

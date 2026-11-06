@@ -1,5 +1,5 @@
-import * as T from './three.module.js';
-import {clipToSurfaceMask} from './surface-masks.js';
+import * as T from './three.module.js?v=grade-20261107';
+import {clipToSurfaceMask} from './surface-masks.js?v=grade-20261107';
 export function addCityWalks({scene,data,mesh,box,mat,M,lampMaterial,lampGlowMaterial,lamps,terrain,walkSurfaces,masks,collisions,clearRoad}){
  const polygon=(points,material,y)=>{const shape=new T.Shape();points.forEach((p,i)=>i?shape.lineTo(p[0],-p[1]):shape.moveTo(p[0],-p[1]));shape.closePath();const g=new T.ShapeGeometry(shape);g.rotateX(-Math.PI/2);const o=mesh(g,material);o.position.y=y;o.castShadow=false;return o};
  for(const river of data.rivers||[])polygon(river,new T.MeshStandardMaterial({color:'#528f9d',roughness:.5,metalness:.1}),terrain.riverLevel);

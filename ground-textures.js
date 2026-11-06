@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 export function addGroundTextures(M){
  let seed=731;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
  const make=(paint,repeat)=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=512;paint(canvas.getContext('2d'));const texture=new T.CanvasTexture(canvas);texture.wrapS=texture.wrapT=T.RepeatWrapping;texture.repeat.setScalar(repeat);texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=8;return texture};

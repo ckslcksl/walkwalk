@@ -1,4 +1,4 @@
-import * as T from './three.module.js';
+import * as T from './three.module.js?v=grade-20261107';
 let restLocations=Array.from({length:24},(_,i)=>i/24);
 export function setRestLocations(locations){restLocations=locations.length?locations:restLocations}
 export function parkHeight(u,offset,length){
