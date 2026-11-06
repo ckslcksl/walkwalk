@@ -59,7 +59,7 @@ export function createWalker({scene,mesh,box,mat}){
  // Riding joints solve the current contact target exactly instead of blending against a walking pose each frame.
  legs[i].rotation.x=h;knees[i].rotation.x=k;ankles[i].rotation.x=-h-k;
  const gripY=cycling?1.22:1.12,gripZ=cycling?-.48:-.47,lean=spine.rotation.x,dy=gripY-rootY-spine.position.y,dz=gripZ-body.position.z,localY=Math.cos(lean)*dy+Math.sin(lean)*dz-.44,localZ=-Math.sin(lean)*dy+Math.cos(lean)*dz,reach=T.MathUtils.clamp(Math.hypot(localY,localZ),.03,.519),bend=-Math.acos(T.MathUtils.clamp((reach*reach-.25*.25-.27*.27)/(2*.25*.27),-1,1)),arm=Math.atan2(-localZ,-localY)+Math.acos(T.MathUtils.clamp((.25*.25+reach*reach-.27*.27)/(2*.25*reach),-1,1));arms[i].rotation.x=arm;arms[i].rotation.z=(i?1:-1)*-.08;elbows[i].rotation.x=bend;
- }return{footfall:false,run:false};}
+ }return{footfall:false,run:false,riding:true,ridePhase};}
  if(pushing&&!sitting&&!gesture){arms[1].rotation.x=damp(arms[1].rotation.x,.85,dt);arms[1].rotation.z=damp(arms[1].rotation.z,.6,dt);elbows[1].rotation.x=damp(elbows[1].rotation.x,.45,dt);}
  if(gesture){const fade=Math.min(1,gestureTime/.25,(2.5-gestureTime)/.3),wave=Math.sin(gestureTime*16);if(gesture==='bow'){spine.rotation.x=lerp(spine.rotation.x,-.7*Math.sin(Math.min(1,gestureTime/2.1)*Math.PI),fade);headRig.rotation.x=-.15*fade;for(let i=0;i<2;i++){arms[i].rotation.x=lerp(arms[i].rotation.x,.13,fade);elbows[i].rotation.x=lerp(elbows[i].rotation.x,.1,fade);}}
  else if(gesture==='wave'){arms[1].rotation.z=lerp(arms[1].rotation.z,2.1+wave*.18,fade);arms[1].rotation.x=lerp(arms[1].rotation.x,.4,fade);elbows[1].rotation.x=lerp(elbows[1].rotation.x,.45+wave*.2,fade);}
