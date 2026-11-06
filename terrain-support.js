@@ -1,3 +1,4 @@
+import {indexedTerrain} from './indexed-terrain.js';
 import * as T from './three.module.js';
 // Sample the actual rendered triangle surface, rather than a different analytic
 // DEM height. Road/path foundations therefore meet the mesh visible from the side.
@@ -13,5 +14,5 @@ export function addPavingFoundations({data,terrain,walkSurfaces,mesh,mat,masks,c
   // Close the ends as well; dead ends are solid fill, never an open sheet.
   for(const t of [0,1]){const p=[];for(const side of [-1,1]){const x=a[0]+dx*t+dz/length*(e.width/2+.12)*side,z=a[1]+dz*t-dx/length*(e.width/2+.12)*side,top=surface(e,x,z,t);p.push({top:[x,top,z],bottom:[x,Math.min(top-.12,terrain.supportHeight(x,z)-.08),z]});}triangle(walls,p[0].top,p[0].bottom,p[1].top);triangle(walls,p[1].top,p[0].bottom,p[1].bottom);}
  }
- for(const [positions,color,key] of [[walls,'#9c9c88','path-foundation']]){const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.computeVertexNormals();const m=mat(color);m.side=T.DoubleSide;if(masks)clip(m,masks.paving,key);const o=mesh(g,m);o.castShadow=false;o.userData.surfaceRole=key;}
+ for(const [positions,color,key] of [[walls,'#9c9c88','path-foundation']]){const g=indexedTerrain(positions);const m=mat(color);m.side=T.DoubleSide;if(masks)clip(m,masks.paving,key);const o=mesh(g,m);o.castShadow=false;o.userData.surfaceRole=key;}
 }

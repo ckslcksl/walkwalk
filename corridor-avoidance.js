@@ -1,0 +1,9 @@
+import {MathUtils} from './three.module.js';
+// Local steering only: longitudinal progress and destination remain on the route graph.
+export function steerInCorridor(state,{x,z,y,dx,dz,width=2,speed,dt,obstacles,base=0}){
+ const limit=Math.max(0,width/2-.26),nx=dz,nz=-dx,near=obstacles.filter(o=>Math.abs(o.y-y)<1.6&&Math.hypot(o.x-x,o.z-z)<4.5),clamp=v=>MathUtils.clamp(v,-limit,limit);state.offset??=base;
+ const risk=near.some(o=>{const along=(o.x-x)*dx+(o.z-z)*dz,cross=(o.x-x)*nx+(o.z-z)*nz;return along>-.65&&along<3&&Math.abs(cross-state.offset)<.85;});
+ if(risk){state.clearTime=0;if(!state.side){const other=near.find(o=>((o.x-x)*dx+(o.z-z)*dz)>-.2);const cross=other?((other.x-x)*nx+(other.z-z)*nz):0,parallel=other?Math.abs(dx*(other.vz||0)-dz*(other.vx||0)):0;state.side=parallel>.25?1:Math.abs(cross)<.12?1:cross>0?-1:1;}}else{state.clearTime=(state.clearTime||0)+dt;if(state.clearTime>.6)state.side=0;}let target=clamp(base);if(risk){const candidates=[clamp(state.target??base),clamp(.72),clamp(-.72),limit,-limit,clamp(base)];let best=Infinity;for(const offset of candidates){if(state.side&&offset*state.side<-.01)continue;let score=Math.abs(offset-base)*.22+(offset<0?.025:0)+Math.abs(offset-state.offset)*.05;for(const o of near)for(const t of [.15,.55,1]){const px=x+dx*speed*t+nx*offset,pz=z+dz*speed*t+nz*offset,ox=o.x+(o.vx||0)*t,oz=o.z+(o.vz||0)*t,d=Math.hypot(px-ox,pz-oz),gap=o.radius||.62;if(d<gap)score+=100*(gap-d)+5;}if(score<best){best=score;target=offset;}}}
+ state.target=target;const delta=target-state.offset;state.offset=clamp(state.offset+MathUtils.clamp(delta,-dt*1.8,dt*1.8));const px=x+dx*speed*dt+nx*state.offset,pz=z+dz*speed*dt+nz*state.offset;
+ const blocked=near.some(o=>Math.hypot(px-o.x,pz-o.z)<(o.radius||.62)*.72&&((o.x-x)*dx+(o.z-z)*dz)>-.15);return{offset:state.offset,blocked};
+}
