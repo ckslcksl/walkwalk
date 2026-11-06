@@ -4,7 +4,7 @@ export function createExploreCamera({camera,canvas,terrain,onChange}){
  const keys=new Set(),position=new T.Vector3();let active=false,yaw=0,pitch=-.28,fast=false;
  const panel=document.createElement('section');panel.className='explore-panel';panel.hidden=true;
  panel.innerHTML='<strong>동네 둘러보기</strong><span>드래그로 시선 · W A S D 이동 · Q / E 높이 · Shift 빠르게</span><label>이동 속도 <select aria-label="자유 카메라 이동 속도"><option value="20">천천히</option><option value="65" selected>빠르게</option><option value="150">아주 빠르게</option></select></label><button>산책 시점으로 돌아가기 <small>Esc</small></button>';
- document.body.append(panel);const select=panel.querySelector('select');
+ document.body.append(panel);const select=panel.querySelector('select');const touch=document.createElement('div');touch.className='explore-touch';touch.innerHTML=[['KeyA','←','왼쪽 이동'],['KeyW','↑','앞으로 이동'],['KeyS','↓','뒤로 이동'],['KeyD','→','오른쪽 이동'],['KeyE','높이 +','카메라 올리기'],['KeyQ','높이 −','카메라 내리기']].map(([key,label,title])=>`<button data-key="${key}" aria-label="${title}">${label}</button>`).join('');panel.append(touch);for(const b of touch.children){b.addEventListener('pointerdown',e=>{e.preventDefault();keys.add(b.dataset.key);b.setPointerCapture(e.pointerId)});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>keys.delete(b.dataset.key));}
  function stop(){active=false;keys.clear();panel.hidden=true;onChange(false)}
  panel.querySelector('button').onclick=stop;
  function start(){position.copy(camera.position);const direction=camera.getWorldDirection(new T.Vector3());yaw=Math.atan2(direction.x,direction.z);pitch=Math.asin(direction.y);active=true;panel.hidden=false;onChange(true)}

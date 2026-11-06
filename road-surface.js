@@ -11,7 +11,7 @@ export function roadSurfaceGeometry(road,terrain){
  for(let i=0;i<sections.length-1;i++)for(let j=0;j<across;j++){const k=i*(across+1)+j;indices.push(k,k+across+1,k+1,k+1,k+across+1,k+across+2)}
  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();return g;
 }
-export function roadSurfaceHeight(road,terrain,x,z){if(terrain.region==='suji'&&!road.bridge){const near=terrain.nearestRoad(x,z);if(near)return terrain.roadHeight(near.road,near.x,near.z)+.065;}return terrain.roadHeight(road,x,z)+.065}
+export function roadSurfaceHeight(road,terrain,x,z){if(terrain.region==='suji'&&!road.bridge){const paved=terrain.pavedRoadHeight?.(x,z);if(Number.isFinite(paved))return paved;const near=terrain.nearestRoad(x,z);if(near)return terrain.roadHeight(near.road,near.x,near.z)+.065;}return terrain.roadHeight(road,x,z)+.065}
 export function roadOutline(road,margin=.35){const s=roadSections(road,1.5);return s.map(p=>[p.x+p.nx*(p.width/2+margin),p.z+p.nz*(p.width/2+margin)]).concat(s.slice().reverse().map(p=>[p.x-p.nx*(p.width/2+margin),p.z-p.nz*(p.width/2+margin)]));}
 // Fill each strip separately: a whole-road outline can self-intersect at a tight bend.
 export function roadCutouts(road){const s=roadSections(road,1.5),result=[],edge=(p,side)=>[Math.fround(p.x+p.nx*p.width/2*side),Math.fround(p.z+p.nz*p.width/2*side)];for(let i=1;i<s.length;i++){const a=edge(s[i-1],-1),b=edge(s[i],-1),c=edge(s[i-1],1),d=edge(s[i],1);result.push([a,b,c],[c,b,d]);}return result;}

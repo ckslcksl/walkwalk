@@ -1,3 +1,4 @@
+import {createRideGear} from './ride-gear.js';
 import * as T from './three.module.js';
 const TAU=Math.PI*2,lerp=T.MathUtils.lerp,damp=(a,b,dt,rate=16)=>lerp(a,b,1-Math.exp(-rate*dt));
 export function createWalker({scene,mesh,box,mat}){
@@ -16,8 +17,11 @@ export function createWalker({scene,mesh,box,mat}){
   const shoulder=new T.Group();shoulder.position.set(side*.34,.44,0);spine.add(shoulder);const upper=mesh(new T.CapsuleGeometry(.085,.13,3,8),shirt,shoulder);upper.position.y=-.13;
   const elbow=new T.Group();elbow.position.y=-.25;shoulder.add(elbow);const forearm=mesh(new T.CapsuleGeometry(.073,.13,3,8),shirt,elbow);forearm.position.y=-.12;const hand=mesh(new T.SphereGeometry(.078,8,8),skin,elbow);hand.position.y=-.27;arms.push(shoulder);elbows.push(elbow);
  }
+ const heartShape=new T.Shape();heartShape.moveTo(0,-.1);heartShape.bezierCurveTo(-.22,.02,-.14,.2,0,.11);heartShape.bezierCurveTo(.14,.2,.22,.02,0,-.1);const heartIcon=mesh(new T.ShapeGeometry(heartShape,12),new T.MeshBasicMaterial({color:'#d98b96',side:T.DoubleSide}),body);heartIcon.position.set(0,1.1,-.43);heartIcon.visible=false;
+ const gear=createRideGear(person);let gesture=null,gestureTime=0,ridePhase=0;
  let phase=0,runBlend=0,rootY=0,wasSitting=false;const desiredRotation=new T.Quaternion(),axis=new T.Vector3(0,1,0);
- function update({dt,speed,run,sitting,heading,time}){
+ function update({dt,speed,run,sitting,heading,time,mode='walk',vehicleMode=mode,dismount=false}){
+ if(gesture){gestureTime+=dt;if(gestureTime>2.5||speed>.2||sitting)gesture=null;}heartIcon.visible=gesture==='heart';if(heartIcon.visible){heartIcon.scale.setScalar(.8+Math.sin(gestureTime*4)*.12);heartIcon.position.y=1.13+Math.sin(gestureTime*3)*.025;}const riding=!sitting&&!gesture&&!dismount&&(mode==='bike'||mode==='scooter'),pushing=!riding&&(vehicleMode==='bike'||vehicleMode==='scooter');gear.update(vehicleMode,speed,dt,ridePhase,pushing);
   if(sitting&&!wasSitting){rootY=0;body.rotation.set(0,0,0);body.position.set(0,0,0);spine.position.y=1.03;legs.forEach(l=>l.rotation.x=Math.PI/2);knees.forEach(k=>k.rotation.x=-Math.PI/2);ankles.forEach(a=>a.rotation.x=0);person.quaternion.setFromAxisAngle(axis,heading)}wasSitting=sitting;spine.position.y=damp(spine.position.y,sitting?1.03:.94,dt,18);
   runBlend=damp(runBlend,run?1:0,dt,5);const nominal=lerp(1.35,3.3,runBlend),activity=T.MathUtils.smoothstep(speed,.025,nominal*.65),frequency=lerp(1.05,1.7,runBlend)*Math.min(1,speed/Math.max(nominal,.1));const oldPhase=phase,nextPhase=phase+dt*frequency,footfall=!sitting&&speed>.2&&Math.floor(nextPhase*2)>Math.floor(oldPhase*2);phase=nextPhase%1;
   const duty=lerp(.64,.4,runBlend),stride=frequency>.001?Math.min(.88,speed*duty/frequency):0;
@@ -45,8 +49,14 @@ export function createWalker({scene,mesh,box,mat}){
    arms[i].rotation.x=damp(arms[i].rotation.x,sitting?.24:swingArm,dt,18);arms[i].rotation.z=damp(arms[i].rotation.z,(i?1:-1)*(sitting?.07:.065),dt);
    elbows[i].rotation.x=damp(elbows[i].rotation.x,sitting?.9:lerp(.16,1.25,runBlend)*activity+.10+(1-runBlend)*Math.max(0,swingArm)*.3,dt,16);
   }
-  return{footfall,run:runBlend>.5};
+  if(riding){ridePhase+=dt*(mode==='bike'?Math.min(1.8,speed*.4):Math.min(1.4,speed*.35));gear.update(mode,0,0,ridePhase);const cycling=mode==='bike';rootY=damp(rootY,cycling?.13:0,dt,12);body.position.set(0,rootY,0);body.rotation.set(0,0,0);spine.position.y=damp(spine.position.y,.94,dt,15);spine.rotation.x=damp(spine.rotation.x,cycling?-.42:-.04,dt,12);spine.rotation.y=damp(spine.rotation.y,0,dt);headRig.rotation.x=damp(headRig.rotation.x,cycling?.27:0,dt);
+ for(let i=0;i<2;i++){const a=(ridePhase+i*.5)*TAU,motion=speed>.05,cycleZ=cycling?.04+Math.sin(a)*.16:i===0?.08:.18+(motion?Math.max(0,Math.sin(a))*.35:0),footY=cycling?.43+Math.cos(a)*.16:i===0?.28:motion?.28-Math.max(0,Math.sin(a))*.17:.28,vertical=.86+rootY-footY,dist=T.MathUtils.clamp(Math.hypot(vertical,cycleZ),.06,.779),upper=.38,lower=.4,k=-Math.acos(T.MathUtils.clamp((dist*dist-upper*upper-lower*lower)/(2*upper*lower),-1,1)),h=Math.atan2(-cycleZ,vertical)+Math.acos(T.MathUtils.clamp((upper*upper+dist*dist-lower*lower)/(2*upper*dist),-1,1));legs[i].rotation.x=damp(legs[i].rotation.x,h,dt,22);knees[i].rotation.x=damp(knees[i].rotation.x,k,dt,22);ankles[i].rotation.x=damp(ankles[i].rotation.x,-h-k,dt,22);arms[i].rotation.x=damp(arms[i].rotation.x,1.05,dt,14);arms[i].rotation.z=damp(arms[i].rotation.z,0,dt);elbows[i].rotation.x=damp(elbows[i].rotation.x,.25,dt,14);}return{footfall:false,run:false};}
+ if(pushing&&!sitting&&!gesture){arms[1].rotation.x=damp(arms[1].rotation.x,.85,dt);arms[1].rotation.z=damp(arms[1].rotation.z,.6,dt);elbows[1].rotation.x=damp(elbows[1].rotation.x,.45,dt);}
+ if(gesture){const fade=Math.min(1,gestureTime/.25,(2.5-gestureTime)/.3),wave=Math.sin(gestureTime*16);if(gesture==='bow'){spine.rotation.x=lerp(spine.rotation.x,.7*Math.sin(Math.min(1,gestureTime/2.1)*Math.PI),fade);headRig.rotation.x=.15*fade;for(let i=0;i<2;i++){arms[i].rotation.x=lerp(arms[i].rotation.x,.13,fade);elbows[i].rotation.x=lerp(elbows[i].rotation.x,.1,fade);}}
+ else if(gesture==='wave'){arms[1].rotation.z=lerp(arms[1].rotation.z,2.1+wave*.18,fade);arms[1].rotation.x=lerp(arms[1].rotation.x,.4,fade);elbows[1].rotation.x=lerp(elbows[1].rotation.x,.45+wave*.2,fade);}
+ else{for(let i=0;i<2;i++){arms[i].rotation.x=lerp(arms[i].rotation.x,1.25,fade);arms[i].rotation.z=lerp(arms[i].rotation.z,(i?-1:1)*.55,fade);elbows[i].rotation.x=lerp(elbows[i].rotation.x,-1.2,fade);}headRig.rotation.z=Math.sin(gestureTime*3)*.08*fade;}return{footfall:false,run:false};}headRig.rotation.z=damp(headRig.rotation.z,0,dt);
+ return{footfall,run:runBlend>.5};
  }
  function setAppearance(config){for(const [key,material]of [['shirt',shirt],['pants',pants],['skin',skin],['shoes',shoe],['cap',cap.material]])if(/^#[0-9a-f]{6}$/i.test(config[key]||''))material.color.set(config[key]);const hat=config.hat!==false;cap.visible=brim.visible=hat;hair.visible=!hat;}
- return{person,update,setAppearance};
+ return{person,update,setAppearance,gear,playGesture(name){if(!['heart','bow','wave'].includes(name))return false;gesture=name;gestureTime=0;return true;},cancelGesture(){gesture=null;},get activeGesture(){return gesture;}};
 }

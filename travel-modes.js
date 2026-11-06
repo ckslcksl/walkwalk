@@ -1,0 +1,2 @@
+export const TRAVEL_MODES={walk:{label:'산책',speed:1.35,key:'KeyW'},run:{label:'러닝',speed:3.3,key:'KeyR'},bike:{label:'자전거',speed:4.2,key:'KeyB'},scooter:{label:'킥보드',speed:3.6,key:'KeyK'}};
+export function travelState(mode,edge){const ride=mode==='bike'||mode==='scooter',dismount=ride&&(edge?.type==='steps'||edge?.tunnel===true&&edge?.width<1.2);return{...TRAVEL_MODES[mode]||TRAVEL_MODES.walk,mode:dismount?'walk':mode,dismount,speed:dismount?1.1:(TRAVEL_MODES[mode]||TRAVEL_MODES.walk).speed};}
