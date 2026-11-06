@@ -1,3 +1,4 @@
+import {bridgeRailRuns} from './bridge-rails.js';
 import * as T from './three.module.js';
 import {roadWidth,roadSections,roadSurfaceGeometry,roadSurfaceHeight} from './road-surface.js';
 import {clipToSurfaceMask} from './surface-masks.js';
@@ -13,14 +14,13 @@ export function addBridgeStructures({data,terrain,mesh,mat,box,walkSurfaces}){
   const across=Math.ceil(roadWidth(road)/2.5)+1,rows=count/across,side=(a,b)=>indices.push(a,b,a+count,a+count,b,b+count);
   for(let i=0;i<rows-1;i++){side(i*across,(i+1)*across);side((i+1)*across+across-1,i*across+across-1)}for(let j=0;j<across-1;j++){side(j+1,j);side((rows-1)*across+j,(rows-1)*across+j+1)}
   const slab=new T.BufferGeometry();slab.setAttribute('position',new T.Float32BufferAttribute(positions,3));slab.setIndex(indices);slab.computeVertexNormals();concrete.side=T.DoubleSide;const slabMesh=mesh(slab,concrete);slabMesh.userData={roadRole:'slab',sourceId:road.sourceId};g.dispose();
-  const sections=roadSections(road,2),point=(s,offset)=>[s.x+s.nx*offset,s.z+s.nz*offset];let distance=0,nextSupport=15;
-  const railPoint=(s,side)=>{let offset=s.width/2-.18;const q=point(s,offset*side),near=walkSurfaces.nearest(...q);if(near.e?.bridge&&near.distance<near.e.width/2+.5){const across=((near.p[0]-s.x)*s.nx+(near.p[1]-s.z)*s.nz)*side;offset=Math.max(offset,across+near.e.width/2+.08);}return point(s,offset*side);};
+  const railRuns=bridgeRailRuns(road,data,walkSurfaces),sections=roadSections(road,2),point=(s,offset)=>[s.x+s.nx*offset,s.z+s.nz*offset];let distance=0,nextSupport=15;
   for(let i=1;i<sections.length;i++){const a=sections[i-1],b=sections[i],step=Math.hypot(b.x-a.x,b.z-a.z);distance+=step;
    for(const side of [-1,1]){
     beam(road,point(a,a.width*.28*side),point(b,b.width*.28*side),.42,.28,concrete,-.46);
     beam(road,point(a,(a.width/2-.18)*side),point(b,(b.width/2-.18)*side),.32,.18,curb,.06);
-    beam(road,railPoint(a,side),railPoint(b,side),.065,.065,steel,.96);
-    const q=railPoint(a,side);box(.065,.86,.065,steel,q[0],roadSurfaceHeight(road,terrain,...q)+.51,q[1]);
+    const run=railRuns[side===-1?0:1],ra=[run[i-1].x,run[i-1].z],rb=[run[i].x,run[i].z];for(const h of [.4,.73,1.08])beam(road,ra,rb,.055,.055,steel,h);
+    for(const q of i===sections.length-1?[ra,rb]:[ra])box(.065,1.06,.065,steel,q[0],roadSurfaceHeight(road,terrain,...q)+.55,q[1]);
    }
    if(distance>=nextSupport){nextSupport+=30;for(const side of [-1,1]){const q=point(b,b.width*.28*side);if(walkSurfaces.nearPath(q[0],q[1],1.8))continue;if(supports.some(p=>Math.hypot(q[0]-p[0],q[1]-p[1])<2))continue;
     const top=roadSurfaceHeight(road,terrain,...q)-.6,bottom=terrain.water(...q)?(terrain.waterBed?.(...q)??-2.8):Math.min(terrain.ground(...q)-.2,top-1);if(top-bottom<.8)continue;

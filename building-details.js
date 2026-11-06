@@ -3,7 +3,7 @@ const buildingNight={value:0};
 export function setBuildingNight(value){buildingNight.value=T.MathUtils.clamp(value,0,1)}
 // Metric facade patterns stay sharp up close without thousands of separate window meshes.
 export function facadeMaterial(mode=0){
- const palettes=['#d3d1c4','#afc2c6','#d0c9bc','#b8c6ce','#c6bbaa','#dad7cc','#baab80','#e5dfcd'];
+ const palettes=['#d3d1c4','#afc2c6','#d0c9bc','#b8c6ce','#c6bbaa','#dad7cc','#baab80','#e5dfcd','#9caeb2'];
  const material=new T.MeshStandardMaterial({color:palettes[mode],roughness:(mode===1||mode===6)?.38:.72,metalness:mode===6?.4:mode===1?.25:.08});
  material.onBeforeCompile=shader=>{
   shader.uniforms.uBuildingNight=buildingNight;
@@ -31,6 +31,7 @@ export function facadeMaterial(mode=0){
     facadeGlow=pane*step(0.78,noise)*(0.18+noise*0.25);
     float floorLine=(1.0-smoothstep(0.018,0.018+aa.y,tile.y));
     diffuseColor.rgb*=1.0-floorLine*0.21;
+    ${mode===8?'float pier=1.0-smoothstep(0.04,0.07,min(tile.x,1.0-tile.x));diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.83,0.86,0.82),pier);':''}
     ${mode===0?'float balcony=smoothstep(0.82,0.84,tile.y)*(1.0-smoothstep(0.90,0.92,tile.y));diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.60,0.62,0.57),balcony*0.35);':''}
     ${mode===2?'float groundStorefront=(1.0-smoothstep(3.1,3.6,vBuildingPosition.y))*smoothstep(0.3,0.6,vBuildingPosition.y);diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.19,0.30,0.31),groundStorefront*0.75);':''}
    }else{diffuseColor.rgb*=0.82;}

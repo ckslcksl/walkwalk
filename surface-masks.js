@@ -11,6 +11,8 @@ export function createSurfaceMasks(data,{terrain,walkSurfaces}={}){
  // Remove both the regional mesh and detailed bank wherever asphalt is visible.
  // The same section frames and widths build the road mesh, eliminating slope intrusion.
  for(const r of data.roads){if(r.bridge)continue;for(const triangle of roadCutouts(r)){polygon(land.ctx,triangle,'#000');polygon(paving.ctx,triangle,'#000');}}
+ // A street overhead must not erase the lower walking deck from its own mask.
+ if(data.region==='suji'&&terrain&&walkSurfaces)for(const e of data.graph.edges){if(e.upper||e.tunnel||e.roadCrossing)continue;const a=data.graph.nodes[e.a],b=data.graph.nodes[e.b],dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz),n=Math.ceil(l/1.5),r=e.width/2+.12;for(let i=0;i<n;i++){const t=(i+.5)/n,x=a[0]+dx*t,z=a[1]+dz*t,road=terrain.nearestRoad(x,z);if(!road||road.d>road.width/2+r||walkSurfaces.heightOnEdge(e,t)>terrain.roadHeight(road.road,road.x,road.z)-2.3)continue;const point=(t,s)=>[a[0]+dx*t+dz/l*r*s,a[1]+dz*t-dx/l*r*s];polygon(paving.ctx,[point(i/n,-1),point((i+1)/n,-1),point((i+1)/n,1),point(i/n,1)],'#fff');}}
  const walkPriority=collectWalkPriority(data,terrain,walkSurfaces);for(const segment of walkPriority){// Raised curbs win through depth; only lower coplanar walks need an asphalt cut.
  if(segment.height<segment.roadY+.04){const c=segment.polygon.reduce((q,p)=>[q[0]+p[0]/4,q[1]+p[1]/4],[0,0]),inset=segment.polygon.map(p=>[c[0]+(p[0]-c[0])*.8,c[1]+(p[1]-c[1])*.8]);polygon(road.ctx,inset,'#ff00ff');}polygon(paving.ctx,segment.polygon,'#fff');}
  return{walkPriority,land:new T.CanvasTexture(land.c),road:new T.CanvasTexture(road.c),paving:new T.CanvasTexture(paving.c)};

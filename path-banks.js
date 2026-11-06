@@ -1,3 +1,4 @@
+import{matchBankTint}from'./bank-tint.js';
 import {indexedTerrain} from './indexed-terrain.js';
 import {yieldToBrowser} from './loading-progress.js';
 import * as T from './three.module.js';
@@ -18,11 +19,11 @@ function* buildaddPathBanks({data,terrain,walkSurfaces,mesh,M,masks,captureCuts}
     if(terrain.water(ox,oz)||road&&road.d<road.width/2+.25||near.e!==e&&near.distance<near.e.width/2+.35){valid=false;break;}
     const top=walkSurfaces.pavingHeight(x,z,walkSurfaces.surfaceAt(e,x,z,t)-.025,-.025),outer=terrain.topHeight(ox,oz);row.push({inner:[x,top,z],outer:[ox,outer,oz]});
    }
-   if(!valid)continue;closeSide(row[0].inner,row[0].outer);closeSide(row.at(-1).outer,row.at(-1).inner);for(let j=1;j<row.length;j++){const p=row[j-1],q=row[j],at=(v,f)=>{const x=T.MathUtils.lerp(v.inner[0],v.outer[0],f),z=T.MathUtils.lerp(v.inner[2],v.outer[2],f),target=T.MathUtils.lerp(v.inner[1],v.outer[1],f);return[x,target,z,f];};for(const [lo,hi] of [[0,.4],[.4,.75],[.75,1]]){const a=at(p,lo),b=at(q,lo),c=at(p,hi),d=at(q,hi);conformBankTriangle([a,c,b],terrain,triangle);conformBankTriangle([b,c,d],terrain,triangle);}closeSide(p.inner,q.inner);draw([p.inner,at(p,.4),at(q,.4),q.inner]);seams.push({inner:p.inner,outer:p.outer,edge:e});}
+   if(!valid)continue;if(i===0)closeSide(row[0].inner,row[0].outer);if(i===steps-1)closeSide(row.at(-1).outer,row.at(-1).inner);for(let j=1;j<row.length;j++){const p=row[j-1],q=row[j],at=(v,f)=>{const x=T.MathUtils.lerp(v.inner[0],v.outer[0],f),z=T.MathUtils.lerp(v.inner[2],v.outer[2],f),target=T.MathUtils.lerp(v.inner[1],v.outer[1],f);return[x,target,z,f];};for(const [lo,hi] of [[0,.4],[.4,.75],[.75,1]]){const a=at(p,lo),b=at(q,lo),c=at(p,hi),d=at(q,hi);conformBankTriangle([a,c,b],terrain,triangle);conformBankTriangle([b,c,d],terrain,triangle);}closeSide(p.inner,q.inner);draw([p.inner,at(p,.4),at(q,.4),q.inner]);seams.push({inner:p.inner,outer:p.outer,edge:e});}
   }
  }
  masks.land.needsUpdate=true;
- const g=indexedTerrain(positions);const material=M.grass.clone();material.color.set('#8fa77a');material.userData.slopeUV=true;material.side=T.DoubleSide;const o=mesh(g,material);o.castShadow=false;o.userData.surfaceRole='terrain-path-transition';
+ const g=indexedTerrain(positions);const material=M.grass.clone();material.color.set('#8fa77a');material.userData.slopeUV=true;material.side=T.DoubleSide;matchBankTint(g,material,terrain);const o=mesh(g,material);o.castShadow=false;o.userData.surfaceRole='terrain-path-transition';
  const fg=indexedTerrain(fill),fm=M.stone.clone();fm.map=null;fm.color.set('#989b83');fm.side=T.DoubleSide;const solid=mesh(fg,fm);solid.castShadow=false;solid.userData.surfaceRole='terrain-bank-fill';return seams;
 }
 
