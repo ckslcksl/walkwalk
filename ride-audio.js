@@ -6,8 +6,8 @@ export function createRideAudio(ctx,output){
  const kickBuffer=ctx.createBuffer(1,Math.ceil(rate*.22),rate),kickData=kickBuffer.getChannelData(0);for(let i=0;i<kickData.length;i++){const t=i/rate;kickData[i]=((Math.random()*2-1)*.045+Math.sin(t*Math.PI*180)*.018)*Math.sin(Math.PI*i/kickData.length)**2;}
  let previousPhase=null,previousMode=null,lastKick=-Infinity;
  function update({speed=0,vehicleMode='walk',riding=false,ridePhase=0,enabled=true}){const moving=enabled&&speed>.08,vehicle=vehicleMode==='bike'||vehicleMode==='scooter',volume=moving&&vehicle?Math.min(1,speed/2.5):0,now=ctx.currentTime;
- tires.gain.gain.setTargetAtTime(volume,now,.08);tires.source.playbackRate.setTargetAtTime(Math.max(.55,Math.min(2,speed/3)),now,.12);
- freewheel.gain.gain.setTargetAtTime(moving&&vehicleMode==='bike'&&riding?volume*.55:0,now,.08);freewheel.source.playbackRate.setTargetAtTime(Math.max(.6,Math.min(1.8,speed/4)),now,.12);
+ tires.gain.gain.setTargetAtTime(volume*(vehicleMode==='bike'?2.2:1),now,.08);tires.source.playbackRate.setTargetAtTime(Math.max(.55,Math.min(2,speed/3)),now,.12);
+ freewheel.gain.gain.setTargetAtTime(moving&&vehicleMode==='bike'&&riding?volume*.825:0,now,.08);freewheel.source.playbackRate.setTargetAtTime(Math.max(.6,Math.min(1.8,speed/4)),now,.12);
  // The left foot starts its grounded push at the beginning of each visual cycle.
  const phase=ridePhase%1,continuous=previousMode===vehicleMode&&previousPhase!==null,crossed=continuous&&(phase<previousPhase||(previousPhase===0&&phase>0));
  if(moving&&vehicleMode==='scooter'&&riding&&crossed&&now-lastKick>.3){const source=ctx.createBufferSource(),gain=ctx.createGain();source.buffer=kickBuffer;gain.gain.value=Math.min(1,speed/1.5);source.connect(gain).connect(output);source.onended=()=>{source.disconnect();gain.disconnect()};source.start();lastKick=now;}

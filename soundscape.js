@@ -1,4 +1,4 @@
-import {createRideAudio} from './ride-audio.js';
+import {createRideAudio} from './ride-audio.js?v=bike-volume-2';
 export function createSoundscape(){
  let ctx,master,wind,water,steps,rides,rideAudio,noiseBuffer,on=false,demoEnd=0,demoWasOn=false,lastSplash=0;const scheduled=[];
  const $=s=>document.querySelector(s),levels={wind:.05,water:.05,steps:.15,rides:.08};

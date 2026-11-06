@@ -6,7 +6,7 @@ import {createExploreCamera} from './explore-camera.js';
 import * as T from './three.module.js';
 import {buildWorld} from './geo-world.js';
 import {createWalker} from './locomotion.js?v=ride-audio-1';
-import {createSoundscape} from './soundscape.js?v=ride-audio-1';
+import {createSoundscape} from './soundscape.js?v=bike-volume-2';
 import {createSeoulDaylight} from './seoul-daylight.js';
 import {connectCharacterSettings} from './character-settings.js';
 import {RouteNavigator} from './route-navigation.js';
